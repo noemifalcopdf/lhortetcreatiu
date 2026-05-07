@@ -18,15 +18,17 @@ const adminPass = document.getElementById("adminPass");
 const loginAdminBtn = document.getElementById("loginAdmin");
 
 const adminContent = document.getElementById("adminContent");
+
 const adminReservas = document.getElementById("adminReservas");
 
 const adminNombre = document.getElementById("adminNombre");
 const bonosInput = document.getElementById("bonos");
 const bonoPublico = document.getElementById("bonoPublico");
+
 const guardarBono = document.getElementById("guardarBono");
 
-const bonosLista = document.getElementById("bonosLista");
 const bonosPublicos = document.getElementById("bonosPublicos");
+const bonosLista = document.getElementById("bonosLista");
 
 const PASSWORD = "hortet2026";
 
@@ -50,8 +52,7 @@ const slots = [
 
 onSnapshot(collection(db,"reservas"), snap=>{
   reservas = snap.docs.map(d=>({id:d.id,...d.data()}));
-  render();
-  renderAdmin();
+  renderReservas();
 });
 
 onSnapshot(collection(db,"bonos"), snap=>{
@@ -85,13 +86,12 @@ function agrupar(){
   return map;
 }
 
-function render(){
+function renderCalendario(){
 
   loading.style.display="none";
   calendar.innerHTML="";
 
   const map = agrupar();
-
   const dias = ["Martes","Miércoles","Jueves","Viernes"];
 
   dias.forEach(dia=>{
@@ -111,7 +111,7 @@ function render(){
         <strong>${slot.hora}</strong>
         <div>${list.length}/8</div>
 
-        <div class="listado">
+        <div>
           ${list.map(r=>`👤 ${r.nombre}`).join("<br>")}
         </div>
 
@@ -121,14 +121,14 @@ function render(){
       div.querySelector("button").onclick=async()=>{
 
         const nombre = nombreInput.value;
-        if(!nombre) return alert("Pon tu nombre");
+        if(!nombre) return alert("Pon nombre");
 
         const bono = bonos[nombre]?.horas||0;
         if(bono<=0) return alert("Sin bonos");
 
         await setDoc(doc(db,"bonos",nombre),{
           horas:bono-1,
-          publico:bonos[nombre]?.publico??true
+          publico:bonos[nombre]?.publico ?? true
         });
 
         await addDoc(collection(db,"reservas"),{
@@ -145,15 +145,14 @@ function render(){
   });
 }
 
-/* ================= ADMIN RESERVAS ================= */
+/* ================= RESERVAS ADMIN ================= */
 
-function renderAdmin(){
-
-  if(adminContent.classList.contains("hidden")) return;
+function renderReservas(){
 
   adminReservas.innerHTML="";
 
   reservas.forEach(r=>{
+
     const div=document.createElement("div");
 
     div.innerHTML=`
@@ -161,10 +160,10 @@ function renderAdmin(){
         <strong>${r.nombre}</strong><br>
         ${r.hora||""}
       </div>
-      <button class="borrar">🗑</button>
+      <button>🗑</button>
     `;
 
-    div.querySelector(".borrar").onclick=async()=>{
+    div.querySelector("button").onclick=async()=>{
       await deleteDoc(doc(db,"reservas",r.id));
     };
 
@@ -176,21 +175,21 @@ function renderAdmin(){
 
 guardarBono.onclick=async()=>{
 
-  const nombre=adminNombre.value;
-  const horas=Number(bonosInput.value);
-  const publico=bonoPublico.checked;
+  const nombre = adminNombre.value;
+  const horas = Number(bonosInput.value);
+  const publico = bonoPublico.checked;
 
   if(!nombre) return alert("Falta nombre");
 
-  const actual=bonos[nombre]?.horas||0;
+  const actual = bonos[nombre]?.horas || 0;
 
   await setDoc(doc(db,"bonos",nombre),{
-    horas:actual+horas,
+    horas: actual + horas,
     publico
   });
 };
 
-/* ================= BONOS ADMIN PANEL ================= */
+/* ================= BONOS ADMIN LISTA ================= */
 
 function renderBonos(){
 
@@ -199,6 +198,7 @@ function renderBonos(){
   Object.entries(bonos).forEach(([nombre,data])=>{
 
     const div=document.createElement("div");
+
     div.className="bono";
 
     div.innerHTML=`
@@ -207,28 +207,28 @@ function renderBonos(){
         ${data.horas}h
       </div>
 
-      <div class="acciones">
-        <button class="mas">+</button>
-        <button class="menos">-</button>
-        <button class="borrar">🗑</button>
+      <div>
+        <button class="plus">+</button>
+        <button class="minus">-</button>
+        <button class="del">🗑</button>
       </div>
     `;
 
-    div.querySelector(".mas").onclick=async()=>{
+    div.querySelector(".plus").onclick=async()=>{
       await setDoc(doc(db,"bonos",nombre),{
         horas:(data.horas||0)+1,
-        publico:data.publico??true
+        publico:data.publico ?? true
       });
     };
 
-    div.querySelector(".menos").onclick=async()=>{
+    div.querySelector(".minus").onclick=async()=>{
       await setDoc(doc(db,"bonos",nombre),{
         horas:Math.max(0,(data.horas||0)-1),
-        publico:data.publico??true
+        publico:data.publico ?? true
       });
     };
 
-    div.querySelector(".borrar").onclick=async()=>{
+    div.querySelector(".del").onclick=async()=>{
       await deleteDoc(doc(db,"bonos",nombre));
     };
 
@@ -240,15 +240,20 @@ function renderBonos(){
 
 function renderBonosPublicos(){
 
-  const visibles=Object.entries(bonos)
-    .filter(([_,b])=>b.publico!==false);
+  const visibles = Object.entries(bonos)
+    .filter(([_,b])=>b.publico !== false);
 
-  bonosPublicos.innerHTML=visibles.length
-    ? `<h2>💳 Bonos</h2>` +
-      visibles.map(([n,b])=>`
-        <div class="bono-item">
-          <strong>${n}</strong> → ${b.horas}h
-        </div>
-      `).join("")
-    : "";
+  bonosPublicos.innerHTML =
+    visibles.length === 0
+      ? ""
+      : `<h2>💳 Bonos</h2>` +
+        visibles.map(([n,b])=>`
+          <div class="bono-item">
+            <strong>${n}</strong> → ${b.horas}h
+          </div>
+        `).join("");
 }
+
+/* ================= INIT ================= */
+
+renderCalendario();
