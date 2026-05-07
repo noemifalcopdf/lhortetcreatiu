@@ -16,7 +16,6 @@ h1 {
   color: #1B7D62;
 }
 
-/* INPUT */
 input {
   padding: 8px;
   border-radius: 10px;
@@ -45,33 +44,11 @@ input {
   margin-top: 8px;
 }
 
-.slot.full {
-  background: #ffe6e6;
-}
-
-.bar {
-  height: 6px;
-  background: #1B7D62;
-  border-radius: 10px;
+.listado {
+  font-size: 13px;
   margin-top: 5px;
 }
 
-/* BONOS */
-#bonosPublicos {
-  background: white;
-  padding: 10px;
-  border-radius: 12px;
-}
-
-.bono-item {
-  border-left: 4px solid #FBB715;
-  padding: 8px;
-  margin-bottom: 6px;
-  background: #fafafa;
-  border-radius: 8px;
-}
-
-/* BOTONES */
 button {
   background: #FBB715;
   color: white;
@@ -79,9 +56,23 @@ button {
   padding: 6px 10px;
   border-radius: 8px;
   font-weight: bold;
+  cursor: pointer;
 }
 
-/* ADMIN NORMAL (NO FLOAT) */
+/* BONOS */
+#bonosPublicos {
+  margin-top: 20px;
+}
+
+.bono-item {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  border-left: 4px solid #FBB715;
+}
+
+/* ADMIN */
 #adminContent {
   margin-top: 10px;
   background: #1B7D62;
@@ -103,4 +94,9 @@ button {
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
+}
+
+/* BOTONES BONOS */
+.acciones button {
+  margin-left: 4px;
 }
