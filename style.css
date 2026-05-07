@@ -1,9 +1,12 @@
 body {
   margin: 0;
   font-family: system-ui;
-  background: #f3f6f5;
+  background-image: url('fondo.jpg');
+  background-size: cover;
+  background-attachment: fixed;
 }
 
+/* CONTENEDOR */
 .container {
   width: 95%;
   max-width: 1100px;
@@ -14,27 +17,30 @@ h1 {
   color: #1B7D62;
 }
 
+/* INPUT */
 input {
   padding: 8px;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
 
-/* CALENDARIO */
+/* CALENDARIO RESPONSIVE */
 #calendar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 20px;
 }
 
 .dia {
+  flex: 1 1 220px;
   background: white;
   padding: 10px;
   border-radius: 12px;
   border-top: 4px solid #1B7D62;
 }
 
+/* SLOT */
 .slot {
   border: 1px solid #eee;
   border-radius: 10px;
@@ -53,7 +59,18 @@ input {
   margin-top: 5px;
 }
 
-/* BONOS PUBLICOS */
+/* BOTONES (FIX VISUAL) */
+button {
+  background: #FBB715;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* BONOS */
 #bonosPublicos {
   margin-top: 30px;
 }
@@ -66,28 +83,28 @@ input {
   border-left: 4px solid #FBB715;
 }
 
-/* ADMIN FOOTER */
+/* ADMIN FIXED PERO NO TAPA */
 .admin {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+
+  max-height: 50vh;
+  overflow-y: auto;
+
   background: #1B7D62;
   color: white;
+
   padding: 10px;
-  max-height: 45vh;
-  overflow-y: auto;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 }
 
 .admin-header {
   font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.hidden {
-  display: none;
+  display: flex;
+  justify-content: space-between;
 }
 
 /* LOGIN */
@@ -103,16 +120,7 @@ input {
   border: none;
 }
 
-button {
-  background: #FBB715;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* ADMIN LISTAS */
+/* LISTAS ADMIN */
 #adminReservas div,
 .bono {
   background: rgba(255,255,255,0.15);
@@ -121,4 +129,11 @@ button {
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+/* BOTÓN BORRAR BONO */
+.bono button {
+  background: #ff4d4d;
+  color: white;
 }
