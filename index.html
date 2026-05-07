@@ -14,42 +14,32 @@
 
   <input id="nombre" placeholder="Tu nombre" />
 
-  <h2>📅 Horarios</h2>
-
+  <!-- CALENDARIO -->
+  <h2>📅 Calendario</h2>
   <div id="loading">Cargando...</div>
   <div id="calendar"></div>
 
-  <!-- BONOS PUBLICOS -->
-  <div id="bonosPublicos" class="hidden">
-    <h2>💳 Bonos</h2>
-    <div id="bonosListaPublica"></div>
-  </div>
+  <!-- BONOS VISIBLES -->
+  <h2>💳 Bonos</h2>
+  <div id="bonosPublicos"></div>
 
-</div>
+  <!-- ACCESO NOEMI -->
+  <h2>🔐 Acceso Noemi</h2>
 
-<!-- ADMIN FOOTER -->
-<div id="adminPanel" class="admin">
-
-  <div class="admin-header">
-    🔐 Acceso Noemi
-  </div>
-
-  <!-- LOGIN -->
   <div id="loginBox">
-    <input id="adminPass" type="password" placeholder="Contraseña admin" />
+    <input id="adminPass" type="password" placeholder="Contraseña" />
     <button id="loginAdmin">Entrar</button>
   </div>
 
-  <!-- PANEL REAL -->
   <div id="adminContent" class="hidden">
 
     <h3>📌 Reservas</h3>
     <div id="adminReservas"></div>
 
-    <h3>⏳ Bonos</h3>
+    <h3>⏳ Gestión de bonos</h3>
 
     <input id="adminNombre" placeholder="Nombre alumno" />
-    <input id="bonos" type="number" placeholder="Horas" />
+    <input id="bonos" type="number" placeholder="Horas a añadir" />
 
     <label>
       <input type="checkbox" id="bonoPublico">
@@ -58,6 +48,7 @@
 
     <button id="guardarBono">Guardar bono</button>
 
+    <h4>Listado bonos</h4>
     <div id="bonosLista"></div>
 
   </div>
