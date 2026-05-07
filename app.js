@@ -23,14 +23,14 @@ const adminReservas = document.getElementById("adminReservas");
 const adminNombre = document.getElementById("adminNombre");
 const bonosInput = document.getElementById("bonos");
 const bonoPublico = document.getElementById("bonoPublico");
-
 const guardarBono = document.getElementById("guardarBono");
 
+const bonosLista = document.getElementById("bonosLista");
 const bonosPublicos = document.getElementById("bonosPublicos");
 
-/* ================= CONFIG ================= */
-
 const PASSWORD = "hortet2026";
+
+/* ================= ESTADO ================= */
 
 let reservas = [];
 let bonos = {};
@@ -60,6 +60,7 @@ onSnapshot(collection(db,"bonos"), snap=>{
     bonos[d.id] = d.data();
   });
 
+  renderBonos();
   renderBonosPublicos();
 });
 
@@ -110,7 +111,7 @@ function render(){
         <strong>${slot.hora}</strong>
         <div>${list.length}/8</div>
 
-        <div style="margin-top:6px;">
+        <div class="listado">
           ${list.map(r=>`👤 ${r.nombre}`).join("<br>")}
         </div>
 
@@ -119,10 +120,10 @@ function render(){
 
       div.querySelector("button").onclick=async()=>{
 
-        const nombre=nombreInput.value;
-        if(!nombre) return alert("Pon nombre");
+        const nombre = nombreInput.value;
+        if(!nombre) return alert("Pon tu nombre");
 
-        const bono=bonos[nombre]?.horas||0;
+        const bono = bonos[nombre]?.horas||0;
         if(bono<=0) return alert("Sin bonos");
 
         await setDoc(doc(db,"bonos",nombre),{
@@ -158,12 +159,12 @@ function renderAdmin(){
     div.innerHTML=`
       <div>
         <strong>${r.nombre}</strong><br>
-        <small>${r.hora||""}</small>
+        ${r.hora||""}
       </div>
-      <button>🗑</button>
+      <button class="borrar">🗑</button>
     `;
 
-    div.querySelector("button").onclick=async()=>{
+    div.querySelector(".borrar").onclick=async()=>{
       await deleteDoc(doc(db,"reservas",r.id));
     };
 
@@ -189,26 +190,65 @@ guardarBono.onclick=async()=>{
   });
 };
 
-/* ================= BONOS PUBLICOS (FIX REAL) ================= */
+/* ================= BONOS ADMIN PANEL ================= */
+
+function renderBonos(){
+
+  bonosLista.innerHTML="";
+
+  Object.entries(bonos).forEach(([nombre,data])=>{
+
+    const div=document.createElement("div");
+    div.className="bono";
+
+    div.innerHTML=`
+      <div>
+        <strong>${nombre}</strong><br>
+        ${data.horas}h
+      </div>
+
+      <div class="acciones">
+        <button class="mas">+</button>
+        <button class="menos">-</button>
+        <button class="borrar">🗑</button>
+      </div>
+    `;
+
+    div.querySelector(".mas").onclick=async()=>{
+      await setDoc(doc(db,"bonos",nombre),{
+        horas:(data.horas||0)+1,
+        publico:data.publico??true
+      });
+    };
+
+    div.querySelector(".menos").onclick=async()=>{
+      await setDoc(doc(db,"bonos",nombre),{
+        horas:Math.max(0,(data.horas||0)-1),
+        publico:data.publico??true
+      });
+    };
+
+    div.querySelector(".borrar").onclick=async()=>{
+      await deleteDoc(doc(db,"bonos",nombre));
+    };
+
+    bonosLista.appendChild(div);
+  });
+}
+
+/* ================= BONOS PUBLICOS ================= */
 
 function renderBonosPublicos(){
 
-  const cont = bonosPublicos;
+  const visibles=Object.entries(bonos)
+    .filter(([_,b])=>b.publico!==false);
 
-  const visibles = Object.entries(bonos)
-    .filter(([_,b])=>b.publico !== false);
-
-  if(visibles.length === 0){
-    cont.innerHTML = "";
-    return;
-  }
-
-  cont.innerHTML = `
-    <h2>💳 Bonos</h2>
-    ${visibles.map(([n,b])=>`
-      <div class="bono-item">
-        <strong>${n}</strong> → ${b.horas}h
-      </div>
-    `).join("")}
-  `;
+  bonosPublicos.innerHTML=visibles.length
+    ? `<h2>💳 Bonos</h2>` +
+      visibles.map(([n,b])=>`
+        <div class="bono-item">
+          <strong>${n}</strong> → ${b.horas}h
+        </div>
+      `).join("")
+    : "";
 }
