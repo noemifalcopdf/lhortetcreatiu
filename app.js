@@ -17,49 +17,42 @@ const loginAdminBtn = document.getElementById("loginAdmin");
 
 const adminContent = document.getElementById("adminContent");
 const adminReservas = document.getElementById("adminReservas");
-const bonosLista = document.getElementById("bonosLista");
 
 const adminNombre = document.getElementById("adminNombre");
 const bonosInput = document.getElementById("bonos");
-const guardarBono = document.getElementById("guardarBono");
 const bonoPublico = document.getElementById("bonoPublico");
 
+const guardarBono = document.getElementById("guardarBono");
+
+const bonosLista = document.getElementById("bonosLista");
+const bonosListaPublica = document.getElementById("bonosListaPublica");
+
+const toggleAdmin = document.getElementById("toggleAdmin");
+
 const PASSWORD = "hortet2026";
-
-const dias = ["Martes","Miércoles","Jueves","Viernes"];
-
-const slots = [
-  { id:"mar-18", dia:"Martes", hora:"18-19" },
-  { id:"mar-19", dia:"Martes", hora:"19-20" },
-  { id:"mie-1930", dia:"Miércoles", hora:"19:30-20:30" },
-  { id:"jue-19", dia:"Jueves", hora:"19-20" },
-  { id:"vie-1830", dia:"Viernes", hora:"18:30-19:30" },
-  { id:"vie-1930", dia:"Viernes", hora:"19:30-20:30" }
-];
 
 let reservas = [];
 let bonos = {};
 
-/* ================= RESERVAS ================= */
-
+/* RESERVAS */
 onSnapshot(collection(db,"reservas"), (snap)=>{
   reservas = snap.docs.map(d=>({id:d.id,...d.data()}));
   render();
   renderAdmin();
 });
 
-/* ================= BONOS ================= */
-
+/* BONOS */
 onSnapshot(collection(db,"bonos"), (snap)=>{
   bonos = {};
   snap.forEach(d=>{
     bonos[d.id] = d.data();
   });
+
   renderBonos();
+  renderBonosPublicos();
 });
 
-/* ================= CALENDARIO ================= */
-
+/* CALENDARIO */
 function agrupar(){
   const m = {};
   for(const r of reservas){
@@ -76,6 +69,8 @@ function render(){
 
   const map = agrupar();
 
+  const dias = ["Martes","Miércoles","Jueves","Viernes"];
+
   dias.forEach(dia=>{
 
     const col = document.createElement("div");
@@ -83,24 +78,19 @@ function render(){
 
     col.innerHTML = `<h3>${dia}</h3>`;
 
-    slots.filter(s=>s.dia===dia).forEach(slot=>{
+    Object.entries(map).forEach(([id,list])=>{
 
-      const list = map[slot.id] || [];
       const n = list.length;
 
       const div = document.createElement("div");
       div.className = "slot";
 
-      if(n >= 8) div.classList.add("full");
-
       div.innerHTML = `
-        <strong>${slot.hora}</strong>
+        <strong>${id}</strong>
         <div>${n}/8</div>
         <div class="bar" style="width:${(n/8)*100}%"></div>
 
-        <div>
-          ${list.map(r=>`👤 ${r.nombre}`).join("<br>")}
-        </div>
+        <div>${list.map(r=>`👤 ${r.nombre}`).join("<br>")}</div>
 
         <button>Reservar</button>
       `;
@@ -108,14 +98,10 @@ function render(){
       div.querySelector("button").onclick = async ()=>{
 
         const nombre = nombreInput.value;
-        if(!nombre) return alert("Pon tu nombre");
-        if(n >= 8) return alert("Completo");
+        if(!nombre) return alert("Pon nombre");
 
         const bono = bonos[nombre]?.horas || 0;
-
-        if(bono <= 0){
-          return alert("No tienes bonos");
-        }
+        if(bono <= 0) return alert("Sin bonos");
 
         await setDoc(doc(db,"bonos",nombre),{
           horas: bono - 1,
@@ -124,9 +110,7 @@ function render(){
 
         await addDoc(collection(db,"reservas"),{
           nombre,
-          horarioId: slot.id,
-          dia: slot.dia,
-          hora: slot.hora,
+          horarioId: id,
           timestamp: Date.now()
         });
       };
@@ -138,51 +122,21 @@ function render(){
   });
 }
 
-/* ================= ADMIN LOGIN ================= */
-
+/* ADMIN */
 loginAdminBtn.onclick = ()=>{
   if(adminPass.value === PASSWORD){
     adminContent.classList.remove("hidden");
-  } else alert("Incorrecto");
+  }
 };
 
-/* ================= ADMIN RESERVAS ================= */
-
-function renderAdmin(){
-
-  if(adminContent.classList.contains("hidden")) return;
-
-  adminReservas.innerHTML = "";
-
-  reservas.forEach(r=>{
-    const d = document.createElement("div");
-
-    d.innerHTML = `
-      <div>
-        <strong>${r.nombre}</strong><br>
-        <small>${r.dia} ${r.hora}</small>
-      </div>
-      <button>🗑</button>
-    `;
-
-    d.querySelector("button").onclick = async ()=>{
-      await deleteDoc(doc(db,"reservas",r.id));
-    };
-
-    adminReservas.appendChild(d);
-  });
-}
-
-/* ================= BONOS ADMIN ================= */
-
+/* BONOS ADMIN */
 guardarBono.onclick = async ()=>{
 
   const nombre = adminNombre.value;
   const horas = Number(bonosInput.value);
   const publico = bonoPublico.checked;
 
-  if(!nombre) return alert("Nombre");
-  if(isNaN(horas)) return alert("Horas inválidas");
+  if(!nombre) return;
 
   const actual = bonos[nombre]?.horas || 0;
 
@@ -192,37 +146,35 @@ guardarBono.onclick = async ()=>{
   });
 };
 
-/* ================= BONOS UI ================= */
-
+/* BONOS ADMIN LISTA */
 function renderBonos(){
-
   bonosLista.innerHTML = Object.entries(bonos)
-    .filter(([_,b])=>b.publico !== false)
     .map(([n,b])=>`
       <div class="bono">
-        <div>
-          <strong>${n}</strong><br>
-          ${b.horas}h
-        </div>
-
-        <div>
-          <button onclick="sumar('${n}',1)">+</button>
-          <button onclick="restar('${n}',1)">-</button>
-        </div>
+        ${n}: ${b.horas}h
       </div>
     `).join("");
-
-  window.sumar = async (n)=>{
-    await setDoc(doc(db,"bonos",n),{
-      horas: (bonos[n]?.horas || 0) + 1,
-      publico: bonos[n]?.publico ?? true
-    });
-  };
-
-  window.restar = async (n)=>{
-    await setDoc(doc(db,"bonos",n),{
-      horas: Math.max(0,(bonos[n]?.horas || 0) - 1),
-      publico: bonos[n]?.publico ?? true
-    });
-  };
 }
+
+/* BONOS PUBLICOS (ALUMNAS) */
+function renderBonosPublicos(){
+
+  const visibles = Object.entries(bonos)
+    .filter(([_,b])=>b.publico !== false);
+
+  if(visibles.length > 0){
+    document.getElementById("bonosPublicos").classList.remove("hidden");
+  }
+
+  bonosListaPublica.innerHTML = visibles
+    .map(([n,b])=>`
+      <div class="bono-item">
+        <strong>${n}</strong> → ${b.horas}h
+      </div>
+    `).join("");
+}
+
+/* FOOTER TOGGLE */
+toggleAdmin.onclick = ()=>{
+  adminContent.classList.toggle("hidden");
+};
