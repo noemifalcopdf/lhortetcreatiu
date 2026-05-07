@@ -34,11 +34,17 @@
     <h3>📌 Reservas</h3>
     <div id="adminReservas"></div>
 
-    <h3>⏳ Bonos alumnos</h3>
+    <h3>⏳ Bonos</h3>
 
     <input id="adminNombre" placeholder="Nombre alumno" />
     <input id="bonos" type="number" placeholder="Horas a añadir" />
-    <button id="guardarBono">Guardar</button>
+
+    <label style="font-size:12px;">
+      <input type="checkbox" id="bonoPublico">
+      Visible para alumnos
+    </label>
+
+    <button id="guardarBono">Guardar bono</button>
 
     <div id="bonosLista"></div>
 
