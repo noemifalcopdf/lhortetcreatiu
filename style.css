@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: system-ui;
+  background-image: url('fondo.jpg');
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 95%;
+  max-width: 1100px;
+  background: #f6f8fb;
+  margin: 30px;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.dia {
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.slot {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.slot.full {
+  background: #ffdede;
+}
+
+.bar {
+  height: 6px;
+  background: #2d6cdf;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+
+/* ADMIN */
+.admin {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 280px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.hidden {
+  display: none;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>L’hortet creatiu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🪴 L’hortet creatiu</h1>
+
+  <input id="nombre" placeholder="Tu nombre" />
+
+  <h2>📅 Calendario</h2>
+
+  <div id="loading">Cargando...</div>
+  <div id="calendar"></div>
+
+</div>
+
+<!-- ADMIN -->
+<div id="adminPanel" class="admin">
+
+  <h2>🔐 Admin</h2>
+
+  <input id="adminPass" type="password" placeholder="Contraseña admin" />
+  <button id="loginAdmin">Entrar</button>
+
+  <div id="adminContent" class="hidden">
+
+    <h3>Reservas</h3>
+    <div id="adminReservas"></div>
+
+    <h3>Bonos</h3>
+    <input id="adminNombre" placeholder="Nombre alumno" />
+    <input id="bonos" type="number" placeholder="Horas" />
+    <button id="guardarBono">Guardar</button>
+
+    <div id="bonosLista"></div>
+
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
