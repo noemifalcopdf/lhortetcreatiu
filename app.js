@@ -8,6 +8,8 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* ================= ELEMENTOS ================= */
+
 const nombreInput = document.getElementById("nombre");
 const calendar = document.getElementById("calendar");
 const loading = document.getElementById("loading");
@@ -21,62 +23,72 @@ const adminReservas = document.getElementById("adminReservas");
 const adminNombre = document.getElementById("adminNombre");
 const bonosInput = document.getElementById("bonos");
 const bonoPublico = document.getElementById("bonoPublico");
+
 const guardarBono = document.getElementById("guardarBono");
 
-const bonosListaPublica = document.getElementById("bonosListaPublica");
 const bonosLista = document.getElementById("bonosLista");
+const bonosListaPublica = document.getElementById("bonosListaPublica");
+
 const bonosPublicos = document.getElementById("bonosPublicos");
 
+/* ================= CONFIG ================= */
+
 const PASSWORD = "hortet2026";
+
+/* ================= ESTADO ================= */
 
 let reservas = [];
 let bonos = {};
 
-/* HORARIOS FIJOS */
+/* ================= HORARIOS ================= */
+
 const slots = [
   { id:"mar-18", dia:"Martes", hora:"18:00 - 19:00" },
   { id:"mar-19", dia:"Martes", hora:"19:00 - 20:00" },
-  { id:"mie-19", dia:"Miércoles", hora:"19:30 - 20:30" },
+  { id:"mie-1930", dia:"Miércoles", hora:"19:30 - 20:30" },
   { id:"jue-19", dia:"Jueves", hora:"19:00 - 20:00" },
   { id:"vie-1830", dia:"Viernes", hora:"18:30 - 19:30" },
   { id:"vie-1930", dia:"Viernes", hora:"19:30 - 20:30" }
 ];
 
-/* RESERVAS */
+/* ================= FIREBASE LISTENERS ================= */
+
 onSnapshot(collection(db,"reservas"), (snap)=>{
   reservas = snap.docs.map(d=>({id:d.id,...d.data()}));
   render();
   renderAdmin();
 });
 
-/* BONOS */
 onSnapshot(collection(db,"bonos"), (snap)=>{
   bonos = {};
   snap.forEach(d=>{
     bonos[d.id] = d.data();
   });
+
   renderBonos();
   renderBonosPublicos();
 });
 
-/* LOGIN ADMIN */
+/* ================= LOGIN ADMIN ================= */
+
 loginAdminBtn.onclick = ()=>{
   if(adminPass.value === PASSWORD){
     adminContent.classList.remove("hidden");
-    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("loginBox").style.display = "none";
   } else {
     alert("Contraseña incorrecta");
   }
 };
 
-/* CALENDARIO */
+/* ================= CALENDARIO ================= */
+
 function agrupar(){
-  const m = {};
+  const map = {};
   for(const r of reservas){
-    if(!m[r.horarioId]) m[r.horarioId] = [];
-    m[r.horarioId].push(r);
+    if(!map[r.horarioId]) map[r.horarioId] = [];
+    map[r.horarioId].push(r);
   }
-  return m;
+  return map;
 }
 
 function render(){
@@ -107,10 +119,12 @@ function render(){
 
       div.innerHTML = `
         <strong>${slot.hora}</strong>
-        <div>${n}/8</div>
+        <div>${n}/8 plazas</div>
         <div class="bar" style="width:${(n/8)*100}%"></div>
 
-        <div>${list.map(r=>`👤 ${r.nombre}`).join("<br>")}</div>
+        <div style="margin-top:6px;">
+          ${list.map(r=>`👤 ${r.nombre}`).join("<br>")}
+        </div>
 
         <button>Reservar</button>
       `;
@@ -118,7 +132,7 @@ function render(){
       div.querySelector("button").onclick = async ()=>{
 
         const nombre = nombreInput.value;
-        if(!nombre) return alert("Pon tu nombre");
+        if(!nombre) return alert("Escribe tu nombre");
 
         const bono = bonos[nombre]?.horas || 0;
         if(bono <= 0) return alert("No tienes bonos");
@@ -131,6 +145,8 @@ function render(){
         await addDoc(collection(db,"reservas"),{
           nombre,
           horarioId: slot.id,
+          hora: slot.hora,
+          dia: slot.dia,
           timestamp: Date.now()
         });
       };
@@ -142,7 +158,8 @@ function render(){
   });
 }
 
-/* ADMIN RESERVAS */
+/* ================= ADMIN RESERVAS ================= */
+
 function renderAdmin(){
 
   if(adminContent.classList.contains("hidden")) return;
@@ -150,10 +167,14 @@ function renderAdmin(){
   adminReservas.innerHTML = "";
 
   reservas.forEach(r=>{
+
     const d = document.createElement("div");
 
     d.innerHTML = `
-      <div>${r.nombre} - ${r.hora || ""}</div>
+      <div>
+        <strong>${r.nombre}</strong><br>
+        <small>${r.dia} ${r.hora || ""}</small>
+      </div>
       <button>🗑</button>
     `;
 
@@ -165,14 +186,15 @@ function renderAdmin(){
   });
 }
 
-/* BONOS ADMIN */
+/* ================= BONOS ADMIN ================= */
+
 guardarBono.onclick = async ()=>{
 
   const nombre = adminNombre.value;
   const horas = Number(bonosInput.value);
   const publico = bonoPublico.checked;
 
-  if(!nombre) return;
+  if(!nombre) return alert("Falta nombre");
 
   const actual = bonos[nombre]?.horas || 0;
 
@@ -182,15 +204,25 @@ guardarBono.onclick = async ()=>{
   });
 };
 
-/* BONOS ADMIN LISTA */
+/* ================= BONOS ADMIN LISTA ================= */
+
 function renderBonos(){
+
   bonosLista.innerHTML = Object.entries(bonos)
     .map(([n,b])=>`
-      <div class="bono">${n}: ${b.horas}h</div>
+      <div class="bono">
+        <span>${n}: ${b.horas}h</span>
+        <button onclick="borrarBono('${n}')">🗑</button>
+      </div>
     `).join("");
+
+  window.borrarBono = async (nombre)=>{
+    await deleteDoc(doc(db,"bonos",nombre));
+  };
 }
 
-/* BONOS PUBLICOS */
+/* ================= BONOS PUBLICOS ================= */
+
 function renderBonosPublicos(){
 
   const visibles = Object.entries(bonos)
@@ -202,6 +234,8 @@ function renderBonosPublicos(){
 
   bonosListaPublica.innerHTML = visibles
     .map(([n,b])=>`
-      <div class="bono-item">${n} → ${b.horas}h</div>
+      <div class="bono-item">
+        <strong>${n}</strong> → ${b.horas}h
+      </div>
     `).join("");
 }
