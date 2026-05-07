@@ -6,7 +6,6 @@ body {
   background-attachment: fixed;
 }
 
-/* CONTENEDOR */
 .container {
   width: 95%;
   max-width: 1100px;
@@ -24,12 +23,11 @@ input {
   border: 1px solid #ddd;
 }
 
-/* CALENDARIO RESPONSIVE */
+/* CALENDARIO */
 #calendar {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 20px;
 }
 
 .dia {
@@ -40,7 +38,6 @@ input {
   border-top: 4px solid #1B7D62;
 }
 
-/* SLOT */
 .slot {
   border: 1px solid #eee;
   border-radius: 10px;
@@ -59,7 +56,22 @@ input {
   margin-top: 5px;
 }
 
-/* BOTONES (FIX VISUAL) */
+/* BONOS */
+#bonosPublicos {
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.bono-item {
+  border-left: 4px solid #FBB715;
+  padding: 8px;
+  margin-bottom: 6px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* BOTONES */
 button {
   background: #FBB715;
   color: white;
@@ -67,73 +79,28 @@ button {
   padding: 6px 10px;
   border-radius: 8px;
   font-weight: bold;
-  cursor: pointer;
 }
 
-/* BONOS */
-#bonosPublicos {
-  margin-top: 30px;
-}
-
-.bono-item {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 6px;
-  border-left: 4px solid #FBB715;
-}
-
-/* ADMIN FIXED PERO NO TAPA */
-.admin {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  max-height: 50vh;
-  overflow-y: auto;
-
+/* ADMIN NORMAL (NO FLOAT) */
+#adminContent {
+  margin-top: 10px;
   background: #1B7D62;
   color: white;
-
-  padding: 10px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  padding: 12px;
+  border-radius: 12px;
 }
 
-.admin-header {
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
+.hidden {
+  display: none;
 }
 
-/* LOGIN */
-#loginBox {
-  display: flex;
-  gap: 8px;
-}
-
-#adminPass {
-  flex: 1;
-  padding: 6px;
-  border-radius: 8px;
-  border: none;
-}
-
-/* LISTAS ADMIN */
+/* LISTAS */
 #adminReservas div,
-.bono {
+#bonosLista div {
   background: rgba(255,255,255,0.15);
   padding: 6px;
   margin-top: 6px;
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-/* BOTÓN BORRAR BONO */
-.bono button {
-  background: #ff4d4d;
-  color: white;
 }
