@@ -8,6 +8,8 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* ================= DOM ================= */
+
 const nombreInput = document.getElementById("nombre");
 const calendar = document.getElementById("calendar");
 const loading = document.getElementById("loading");
@@ -25,11 +27,16 @@ const bonoPublico = document.getElementById("bonoPublico");
 const guardarBono = document.getElementById("guardarBono");
 
 const bonosPublicos = document.getElementById("bonosPublicos");
-const bonosLista = document.getElementById("bonosLista");
+
+/* ================= CONFIG ================= */
 
 const PASSWORD = "hortet2026";
 
-/* HORARIOS */
+let reservas = [];
+let bonos = {};
+
+/* ================= HORARIOS ================= */
+
 const slots = [
   { id:"mar-18", dia:"Martes", hora:"18:00 - 19:00" },
   { id:"mar-19", dia:"Martes", hora:"19:00 - 20:00" },
@@ -39,25 +46,25 @@ const slots = [
   { id:"vie-1930", dia:"Viernes", hora:"19:30 - 20:30" }
 ];
 
-let reservas = [];
-let bonos = {};
+/* ================= FIREBASE ================= */
 
-/* RESERVAS */
 onSnapshot(collection(db,"reservas"), snap=>{
   reservas = snap.docs.map(d=>({id:d.id,...d.data()}));
   render();
   renderAdmin();
 });
 
-/* BONOS */
 onSnapshot(collection(db,"bonos"), snap=>{
   bonos = {};
-  snap.forEach(d=>bonos[d.id]=d.data());
-  renderBonos();
+  snap.forEach(d=>{
+    bonos[d.id] = d.data();
+  });
+
   renderBonosPublicos();
 });
 
-/* LOGIN */
+/* ================= LOGIN ================= */
+
 loginAdminBtn.onclick = ()=>{
   if(adminPass.value === PASSWORD){
     adminContent.classList.remove("hidden");
@@ -66,7 +73,8 @@ loginAdminBtn.onclick = ()=>{
   }
 };
 
-/* CALENDARIO */
+/* ================= CALENDARIO ================= */
+
 function agrupar(){
   const map = {};
   reservas.forEach(r=>{
@@ -77,6 +85,7 @@ function agrupar(){
 }
 
 function render(){
+
   loading.style.display="none";
   calendar.innerHTML="";
 
@@ -85,7 +94,7 @@ function render(){
   const dias = ["Martes","Miércoles","Jueves","Viernes"];
 
   dias.forEach(dia=>{
-    const col = document.createElement("div");
+    const col=document.createElement("div");
     col.className="dia";
 
     col.innerHTML=`<h3>${dia}</h3>`;
@@ -94,14 +103,14 @@ function render(){
 
       const list = map[slot.id]||[];
 
-      const div = document.createElement("div");
+      const div=document.createElement("div");
       div.className="slot";
 
       div.innerHTML=`
         <strong>${slot.hora}</strong>
         <div>${list.length}/8</div>
 
-        <div>
+        <div style="margin-top:6px;">
           ${list.map(r=>`👤 ${r.nombre}`).join("<br>")}
         </div>
 
@@ -110,15 +119,15 @@ function render(){
 
       div.querySelector("button").onclick=async()=>{
 
-        const nombre = nombreInput.value;
+        const nombre=nombreInput.value;
         if(!nombre) return alert("Pon nombre");
 
-        const bono = bonos[nombre]?.horas||0;
+        const bono=bonos[nombre]?.horas||0;
         if(bono<=0) return alert("Sin bonos");
 
         await setDoc(doc(db,"bonos",nombre),{
-          horas: bono-1,
-          publico: bonos[nombre]?.publico ?? true
+          horas:bono-1,
+          publico:bonos[nombre]?.publico??true
         });
 
         await addDoc(collection(db,"reservas"),{
@@ -135,7 +144,8 @@ function render(){
   });
 }
 
-/* ADMIN RESERVAS */
+/* ================= ADMIN RESERVAS ================= */
+
 function renderAdmin(){
 
   if(adminContent.classList.contains("hidden")) return;
@@ -146,7 +156,10 @@ function renderAdmin(){
     const div=document.createElement("div");
 
     div.innerHTML=`
-      ${r.nombre} - ${r.hora||""}
+      <div>
+        <strong>${r.nombre}</strong><br>
+        <small>${r.hora||""}</small>
+      </div>
       <button>🗑</button>
     `;
 
@@ -158,12 +171,15 @@ function renderAdmin(){
   });
 }
 
-/* BONOS ADMIN */
+/* ================= BONOS ADMIN ================= */
+
 guardarBono.onclick=async()=>{
 
   const nombre=adminNombre.value;
   const horas=Number(bonosInput.value);
   const publico=bonoPublico.checked;
+
+  if(!nombre) return alert("Falta nombre");
 
   const actual=bonos[nombre]?.horas||0;
 
@@ -173,23 +189,26 @@ guardarBono.onclick=async()=>{
   });
 };
 
-/* BONOS */
-function renderBonos(){
-  bonosLista.innerHTML=Object.entries(bonos)
-    .map(([n,b])=>`<div>${n}: ${b.horas}h</div>`)
-    .join("");
-}
+/* ================= BONOS PUBLICOS (FIX REAL) ================= */
 
-/* BONOS PUBLICOS */
 function renderBonosPublicos(){
 
-  const visibles=Object.entries(bonos)
-    .filter(([_,b])=>b.publico!==false);
+  const cont = bonosPublicos;
 
-  bonosPublicos.innerHTML=visibles
-    .map(([n,b])=>`
+  const visibles = Object.entries(bonos)
+    .filter(([_,b])=>b.publico !== false);
+
+  if(visibles.length === 0){
+    cont.innerHTML = "";
+    return;
+  }
+
+  cont.innerHTML = `
+    <h2>💳 Bonos</h2>
+    ${visibles.map(([n,b])=>`
       <div class="bono-item">
-        ${n} → ${b.horas}h
+        <strong>${n}</strong> → ${b.horas}h
       </div>
-    `).join("");
+    `).join("")}
+  `;
 }
