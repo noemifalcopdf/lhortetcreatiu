@@ -19,17 +19,26 @@
   <div id="loading">Cargando...</div>
   <div id="calendar"></div>
 
+  <!-- BONOS VISIBLES -->
+  <div id="bonosPublicos" class="bonos-publicos hidden">
+    <h2>💳 Bonos</h2>
+    <div id="bonosListaPublica"></div>
+  </div>
+
 </div>
 
-<!-- ADMIN DASHBOARD -->
+<!-- FOOTER ADMIN -->
 <div id="adminPanel" class="admin">
 
-  <h2>🔐 Admin Dashboard</h2>
-
-  <input id="adminPass" type="password" placeholder="Contraseña admin" />
-  <button id="loginAdmin">Entrar</button>
+  <div class="admin-header">
+    🔐 Acceso Noemi
+    <button id="toggleAdmin">▲</button>
+  </div>
 
   <div id="adminContent" class="hidden">
+
+    <input id="adminPass" type="password" placeholder="Contraseña" />
+    <button id="loginAdmin">Entrar</button>
 
     <h3>📌 Reservas</h3>
     <div id="adminReservas"></div>
@@ -37,11 +46,11 @@
     <h3>⏳ Bonos</h3>
 
     <input id="adminNombre" placeholder="Nombre alumno" />
-    <input id="bonos" type="number" placeholder="Horas a añadir" />
+    <input id="bonos" type="number" placeholder="Horas" />
 
-    <label style="font-size:12px;">
+    <label>
       <input type="checkbox" id="bonoPublico">
-      Visible para alumnos
+      Visible para alumnas
     </label>
 
     <button id="guardarBono">Guardar bono</button>
