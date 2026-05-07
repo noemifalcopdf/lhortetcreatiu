@@ -14,31 +14,34 @@
 
   <input id="nombre" placeholder="Tu nombre" />
 
-  <h2>📅 Calendario</h2>
+  <h2>📅 Horarios</h2>
 
   <div id="loading">Cargando...</div>
   <div id="calendar"></div>
 
-  <!-- BONOS VISIBLES -->
-  <div id="bonosPublicos" class="bonos-publicos hidden">
+  <!-- BONOS PUBLICOS -->
+  <div id="bonosPublicos" class="hidden">
     <h2>💳 Bonos</h2>
     <div id="bonosListaPublica"></div>
   </div>
 
 </div>
 
-<!-- FOOTER ADMIN -->
+<!-- ADMIN FOOTER -->
 <div id="adminPanel" class="admin">
 
   <div class="admin-header">
     🔐 Acceso Noemi
-    <button id="toggleAdmin">▲</button>
   </div>
 
-  <div id="adminContent" class="hidden">
-
-    <input id="adminPass" type="password" placeholder="Contraseña" />
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <input id="adminPass" type="password" placeholder="Contraseña admin" />
     <button id="loginAdmin">Entrar</button>
+  </div>
+
+  <!-- PANEL REAL -->
+  <div id="adminContent" class="hidden">
 
     <h3>📌 Reservas</h3>
     <div id="adminReservas"></div>
@@ -50,7 +53,7 @@
 
     <label>
       <input type="checkbox" id="bonoPublico">
-      Visible para alumnas
+      Visible para alumnos
     </label>
 
     <button id="guardarBono">Guardar bono</button>
@@ -58,6 +61,7 @@
     <div id="bonosLista"></div>
 
   </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
