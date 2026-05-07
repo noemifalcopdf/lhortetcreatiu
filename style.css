@@ -4,19 +4,16 @@ body {
   background: #f3f6f5;
 }
 
-/* HEADER */
-h1 {
-  color: #1B7D62;
-}
-
-/* CONTAINER */
 .container {
   width: 95%;
   max-width: 1100px;
   margin: 20px auto;
 }
 
-/* INPUT */
+h1 {
+  color: #1B7D62;
+}
+
 input {
   padding: 8px;
   border-radius: 10px;
@@ -26,15 +23,15 @@ input {
 /* CALENDARIO */
 #calendar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-top: 20px;
 }
 
 .dia {
   background: white;
-  border-radius: 14px;
   padding: 10px;
+  border-radius: 12px;
   border-top: 4px solid #1B7D62;
 }
 
@@ -43,15 +40,10 @@ input {
   border-radius: 10px;
   padding: 8px;
   margin-top: 8px;
-  transition: 0.2s;
-}
-
-.slot:hover {
-  border-color: #1B7D62;
 }
 
 .slot.full {
-  background: #ffeaea;
+  background: #ffe6e6;
 }
 
 .bar {
@@ -61,18 +53,8 @@ input {
   margin-top: 5px;
 }
 
-/* BOTÓN */
-button {
-  background: #FBB715;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
 /* BONOS PUBLICOS */
-.bonos-publicos {
+#bonosPublicos {
   margin-top: 30px;
 }
 
@@ -84,7 +66,7 @@ button {
   border-left: 4px solid #FBB715;
 }
 
-/* FOOTER ADMIN */
+/* ADMIN FOOTER */
 .admin {
   position: fixed;
   bottom: 0;
@@ -92,44 +74,51 @@ button {
   right: 0;
   background: #1B7D62;
   color: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
   padding: 10px;
   max-height: 45vh;
   overflow-y: auto;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-weight: bold;
+  margin-bottom: 8px;
 }
 
 .hidden {
   display: none;
 }
 
-/* ADMIN CONTENT */
-#adminContent input {
-  width: 100%;
-  margin-top: 6px;
+/* LOGIN */
+#loginBox {
+  display: flex;
+  gap: 8px;
 }
 
-#adminReservas div {
+#adminPass {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  background: #FBB715;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ADMIN LISTAS */
+#adminReservas div,
+.bono {
   background: rgba(255,255,255,0.15);
   padding: 6px;
   margin-top: 6px;
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
-}
-
-.bono {
-  display: flex;
-  justify-content: space-between;
-  background: rgba(255,255,255,0.15);
-  padding: 8px;
-  margin-top: 6px;
-  border-radius: 10px;
 }
