@@ -22,6 +22,7 @@ const bonosLista = document.getElementById("bonosLista");
 const adminNombre = document.getElementById("adminNombre");
 const bonosInput = document.getElementById("bonos");
 const guardarBono = document.getElementById("guardarBono");
+const bonoPublico = document.getElementById("bonoPublico");
 
 const PASSWORD = "hortet2026";
 
@@ -39,7 +40,7 @@ const slots = [
 let reservas = [];
 let bonos = {};
 
-// ================= RESERVAS =================
+/* ================= RESERVAS ================= */
 
 onSnapshot(collection(db,"reservas"), (snap)=>{
   reservas = snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -47,17 +48,17 @@ onSnapshot(collection(db,"reservas"), (snap)=>{
   renderAdmin();
 });
 
-// ================= BONOS =================
+/* ================= BONOS ================= */
 
 onSnapshot(collection(db,"bonos"), (snap)=>{
   bonos = {};
   snap.forEach(d=>{
-    bonos[d.id] = d.data().horas;
+    bonos[d.id] = d.data();
   });
   renderBonos();
 });
 
-// ================= CALENDARIO =================
+/* ================= CALENDARIO ================= */
 
 function agrupar(){
   const m = {};
@@ -110,15 +111,15 @@ function render(){
         if(!nombre) return alert("Pon tu nombre");
         if(n >= 8) return alert("Completo");
 
-        const horas = bonos[nombre] || 0;
+        const bono = bonos[nombre]?.horas || 0;
 
-        if(horas <= 0){
-          return alert("No tienes bonos disponibles");
+        if(bono <= 0){
+          return alert("No tienes bonos");
         }
 
-        // 🔥 AUTODESCUENTO
         await setDoc(doc(db,"bonos",nombre),{
-          horas: horas - 1
+          horas: bono - 1,
+          publico: bonos[nombre]?.publico ?? true
         });
 
         await addDoc(collection(db,"reservas"),{
@@ -137,19 +138,18 @@ function render(){
   });
 }
 
-// ================= ADMIN LOGIN =================
+/* ================= ADMIN LOGIN ================= */
 
 loginAdminBtn.onclick = ()=>{
   if(adminPass.value === PASSWORD){
     adminContent.classList.remove("hidden");
-  } else {
-    alert("Incorrecto");
-  }
+  } else alert("Incorrecto");
 };
 
-// ================= ADMIN RESERVAS =================
+/* ================= ADMIN RESERVAS ================= */
 
 function renderAdmin(){
+
   if(adminContent.classList.contains("hidden")) return;
 
   adminReservas.innerHTML = "";
@@ -173,31 +173,36 @@ function renderAdmin(){
   });
 }
 
-// ================= BONOS ADMIN =================
+/* ================= BONOS ADMIN ================= */
 
 guardarBono.onclick = async ()=>{
+
   const nombre = adminNombre.value;
   const horas = Number(bonosInput.value);
+  const publico = bonoPublico.checked;
 
   if(!nombre) return alert("Nombre");
   if(isNaN(horas)) return alert("Horas inválidas");
 
-  const actual = bonos[nombre] || 0;
+  const actual = bonos[nombre]?.horas || 0;
 
   await setDoc(doc(db,"bonos",nombre),{
-    horas: actual + horas
+    horas: actual + horas,
+    publico
   });
 };
 
-// ================= BONOS UI =================
+/* ================= BONOS UI ================= */
 
 function renderBonos(){
+
   bonosLista.innerHTML = Object.entries(bonos)
-    .map(([n,h])=>`
+    .filter(([_,b])=>b.publico !== false)
+    .map(([n,b])=>`
       <div class="bono">
         <div>
           <strong>${n}</strong><br>
-          ${h} horas
+          ${b.horas}h
         </div>
 
         <div>
@@ -207,15 +212,17 @@ function renderBonos(){
       </div>
     `).join("");
 
-  window.sumar = async (n,h)=>{
+  window.sumar = async (n)=>{
     await setDoc(doc(db,"bonos",n),{
-      horas: (bonos[n] || 0) + h
+      horas: (bonos[n]?.horas || 0) + 1,
+      publico: bonos[n]?.publico ?? true
     });
   };
 
-  window.restar = async (n,h)=>{
+  window.restar = async (n)=>{
     await setDoc(doc(db,"bonos",n),{
-      horas: Math.max(0,(bonos[n] || 0) - h)
+      horas: Math.max(0,(bonos[n]?.horas || 0) - 1),
+      publico: bonos[n]?.publico ?? true
     });
   };
 }
